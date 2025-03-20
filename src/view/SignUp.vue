@@ -1,4 +1,7 @@
 <template>
+  <div class="loading_info" v-if="isLoading">
+    <p>회원가입 처리 중 ...</p>
+  </div>
   <div class="form-container">
     <form @submit.prevent="handleSignup">
       <div class="form-group">
@@ -42,13 +45,13 @@
         />
       </div>
       <div class="form-group">
-        <label for="address">Address</label>
+        <label for="addr">Address</label>
         <input 
           type="text" 
-          id="address" 
+          id="addr" 
           placeholder="주소 입력"
           required
-          v-model="address"
+          v-model="addr"
         />
       </div>
       <div class="form-group">
@@ -61,17 +64,21 @@
 </template>
   
 <script setup>
+import { useRouter } from 'vue-router';
 import supabase from '../supabase';
 import { ref } from 'vue';
 
+const router = useRouter();
 const email = ref('');
 const password = ref('');
 const tel = ref('');
 const text = ref('');
 const name = ref('');
 const address = ref('');
+const isLoading = ref(false);
 
  const  handleSignup = async() => {
+    isLoading.value = true
     const { data, error } = await supabase.auth.signUp({
     email: email.value,
     password: password.value,
@@ -80,17 +87,20 @@ const address = ref('');
   if(error) {
     alert(error.message)
   } else {
-    console.log('회원가입 성공')
     const { error } = await supabase
     .from('user_table') // 테이블명 
     .insert({ 
       tel: tel.value,
       text: text.value,
       name: name.value,
-      address: address.value
+      addr: addr.value
      })  
      if(error){
       console.log(error)
+     } else {
+        alert('회원가입 성공');
+        isLoading.value = false;
+        router.push('/')
      }
   }
 }
@@ -99,4 +109,14 @@ const address = ref('');
   
 <style lang="scss">
   @use "../style/form.scss";
+
+  .loading_info {
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0, 0.7);
+    color: #fff;
+    display: grid;
+    place-items: center;
+  }
 </style>
