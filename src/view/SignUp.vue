@@ -109,14 +109,4 @@ const isLoading = ref(false);
   
 <style lang="scss">
   @use "../style/form.scss";
-
-  .loading_info {
-    position: fixed;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0, 0.7);
-    color: #fff;
-    display: grid;
-    place-items: center;
-  }
 </style>
