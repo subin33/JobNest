@@ -32,6 +32,26 @@
         />
       </div>
       <div class="form-group">
+        <label for="name">Name</label>
+        <input 
+          type="text" 
+          id="name" 
+          placeholder="이름 입력"
+          required
+          v-model="name"
+        />
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <input 
+          type="text" 
+          id="address" 
+          placeholder="주소 입력"
+          required
+          v-model="address"
+        />
+      </div>
+      <div class="form-group">
         <label for="text">자기소개</label>
         <textarea id="text" v-model="text"></textarea>
       </div>
@@ -48,6 +68,8 @@ const email = ref('');
 const password = ref('');
 const tel = ref('');
 const text = ref('');
+const name = ref('');
+const address = ref('');
 
  const  handleSignup = async() => {
     const { data, error } = await supabase.auth.signUp({
@@ -59,7 +81,17 @@ const text = ref('');
     alert(error.message)
   } else {
     console.log('회원가입 성공')
-    console.log(data)
+    const { error } = await supabase
+    .from('user_table') // 테이블명 
+    .insert({ 
+      tel: tel.value,
+      text: text.value,
+      name: name.value,
+      address: address.value
+     })  
+     if(error){
+      console.log(error)
+     }
   }
 }
   
