@@ -103,14 +103,13 @@
 </template>
   
 <script setup>
+  import { useAuth } from '../auth/auth';
   import { useRouter } from 'vue-router';
   import supabase from '../supabase';
   import { ref , onMounted} from 'vue';
   import { Icon } from '@iconify/vue';
 
-
-  const isLogin = ref(false); //화면 표시 상태 변수 
-  const router = useRouter;
+  const { isLogin , user , checkLoginStatus } = useAuth ();
 
   const title = ref('');
   const todo = ref('');
@@ -123,24 +122,11 @@
 
   // 마운트시 로그인 상태 확인하기 
   onMounted(async() => {
-    const { data: { user } } = await supabase.auth.getUser();
-    console.log(user?.email);
 
-    if(user) {
-      console.log('로그인 상태');
-      isLogin.value = true;
+    await checkLoginStatus();
 
-      //user 정보 가져오기 
-      const { data, error } = await supabase
-      .from('user_table')
-      .select()
-      .eq('id', user.id)
-    } else {
-      console.log('로그아웃 상태');
-      isLogin.value = false;
-      alert('로그인 후 이용해주세요.');
-      router.push('/');
-    }
+    console.log('auth 정보', isLogin.value, user.value )
+    
   })
 
 </script>
