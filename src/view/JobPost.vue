@@ -93,10 +93,11 @@
           <p class="title">사진(선택)</p>
           <figure>
             <Icon icon="mdi-light:camera" width="64" height="64"  style="color: #1e1e1e;" />
-            <img src="/box64.jpg" alt="미리보기" width="64" height="64" />
+            <img :src="previewImage" alt="미리보기" width="64" height="64" v-if="previewImage" /> 
+            <img src="/box64.jpg" alt="미리보기" width="64" height="64" v-if="!previewImage"/>
           </figure>
         </label>
-        <input type="file" id="photo" accept="image/*">
+        <input @change="onFileChange" type="file" id="photo" accept="image/*">
       </div>
     </form>
   </div>
@@ -106,7 +107,7 @@
   import { useAuth } from '../auth/auth';
   import { useRouter } from 'vue-router';
   import supabase from '../supabase';
-  import { ref , onMounted} from 'vue';
+  import { ref , onMounted, onUnmounted} from 'vue';
   import { Icon } from '@iconify/vue';
 
   const { isLogin , user , checkLoginStatus } = useAuth ();
@@ -120,13 +121,30 @@
   const location = ref('');
   const tel = ref('');
 
+  const previewImage = ref(null);
+
+
+  const onFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    if(file) {
+      previewImage.value = URL.createObjectURL(file);
+      console.log(previewImage.value)
+    }
+  }
+
   // 마운트시 로그인 상태 확인하기 
   onMounted(async() => {
 
     await checkLoginStatus();
+  })
 
-    console.log('auth 정보', isLogin.value, user.value )
-    
+  onUnmounted(()=> {
+    console.log('unmounted')
+    // 메모리 누수 방지 
+    if(previewImage.value){
+      URL.revokeObjectURL(previewImage.value);
+    }
   })
 
 </script>
