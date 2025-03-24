@@ -1,6 +1,9 @@
 <template>
+  <div class="loading_info" v-if="isLoading">
+    <p>저장중...</p>
+  </div>
   <div class="form-container" v-if="isLogin">
-    <form>
+    <form @submit.prevent="handleSubmit">
       <!-- 1.제목 -->
       <div class="form-group">
         <label for="title">제목</label>
@@ -99,6 +102,10 @@
         </label>
         <input @change="onFileChange" type="file" id="photo" accept="image/*">
       </div>
+
+      <button class="btn-submit">
+        등록하기
+      </button>
     </form>
   </div>
 </template>
@@ -112,6 +119,9 @@
 
   const { isLogin , user , checkLoginStatus } = useAuth ();
 
+  const router  = useRouter();
+  const isLoading = ref(false);
+
   const title = ref('');
   const todo = ref('');
   const pay_rule = ref('');
@@ -122,6 +132,30 @@
   const tel = ref('');
   // img_url: 첨부한 사진은 storage에 저장하고 url 저장
   // author: 작성자 id(auth.user의 uid)
+
+  const handleSubmit = async () => {
+    isLoading.value = true;
+    const { error } = await supabase
+  .from('job_post')
+  .insert({ 
+    title: title.value,
+    todo: todo.value,
+    pay_rule: pay_rule.value,
+    pay: pay.value,
+    desc: desc.value,
+    company_name: company_name.value,
+    location: location.value,
+    tel: tel.value,
+    img_url: 'https://placehold.co/400x250',
+   })
+   if(error) {
+    alert(error.message);
+   }else {
+    alert('등록 성공')
+    router.push('/job-list')
+   }
+   isLoading.value = false;
+  }
 
   const previewImage = ref(null);
 
