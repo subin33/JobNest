@@ -19,7 +19,7 @@
     </div>
     <!-- 하단 고정 버튼 -->
     <div class="bottom-btn-group" v-if="post && post.author !== user.id">
-      <button class="btn-tel">전화문의</button>
+      <a class="btn-tel" :href="`tel:${post.tel}`">전화문의</a>
       <button class="btn-apply">지원하기</button>
     </div>
     <div class="bottom-btn-group" v-if="post && post.author === user.id">
