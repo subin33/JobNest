@@ -25,7 +25,7 @@
 
   // 구인 목록 가져오기
   onMounted(async() => {
-    const {data,error} = await supabase.from('job_post').select('*');
+    const {data,error} = await supabase.from('job_post').select('*').order('created_at' ,{ascending:false});
     posts.value = data;
     console.log(posts.value)
 
