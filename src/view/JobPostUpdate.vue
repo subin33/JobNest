@@ -110,13 +110,15 @@
 
 <script setup>
   import { useAuth } from '../auth/auth';
-  import { useRouter } from 'vue-router';
+  // useRouter-> push() 페이지 이동 등 사용, useRoute-> 현재 경로를 알고 싶거나, 전달된 매게 변수 params 를 참조 할때 사용
+  import { useRouter, useRoute} from 'vue-router';
   import supabase from '../supabase';
   import { ref, onMounted, onUnmounted } from 'vue';
   import { Icon } from '@iconify/vue';
 
   const { isLogin, user, checkLoginStatus } = useAuth();
-  const router = useRouter();
+  const router = useRouter(); // 페이지 이동 모듈
+  const route = useRoute(); // param 또는 경로 참조 
   const isLoading = ref(false);
 
   // 입력 항목
@@ -135,8 +137,8 @@
     isLoading.value = true;
 
     const { error } = await supabase
-      .from('job_posts')
-      .insert({ 
+      .from('job_post')
+      .update({ 
         title: title.value,
         todo: todo.value,
         pay_rule: pay_rule.value,
@@ -147,10 +149,11 @@
         tel: tel.value,
         img_url: 'https://placehold.co/400x250',
       })
+      .eq('id', route.params.id)
       if(error) {
-        alert(error.message || '등록 실패');
+        alert(error.message || '글수정 실패');
       } else {
-        alert('등록 성공');
+        alert('글수정 성공');
         router.push('/job-list');
       }
       
@@ -169,10 +172,31 @@
     }
   }
 
+  //수정할 글 가져오기 
+  const getPost = async() => {
+    const {data, error} = await supabase
+    .from('job_post')
+    .select()
+    .eq('id', route.params.id)
+    .single()
+
+    // 가져온 데이터를 상태 변수에 저장하여 폼에 표시 
+    title.value = data.title;
+    todo.value = data.todo;
+    pay_rule.value = data.pay_rule;
+    pay.value = data.pay;
+    desc.value = data.desc;
+    company_name.value = data.company_name;
+    location.value = data.location;
+    tel.value = data.tel;
+    previewImage.value = data.img_url;
+  }
+
   // 마운트시 로그인 상태 확인하기
   onMounted(async() => {
 
     await checkLoginStatus();
+    getPost();
     // console.log('auth 정보', isLogin.value, user.value.email);
   })
 
