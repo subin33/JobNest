@@ -30,7 +30,6 @@
 
       <!-- 3.시급, 월급 항목 선택 -->
       <div class="form-group">
-        <!-- radio 입력 항목들을 그룹화 하려면 name 속성을 추가해야 한다.  -->
         <input type="radio" id="pay_rule1" name="pay_rule" value="시급" v-model="pay_rule" required checked>
         <input type="radio" id="pay_rule2" name="pay_rule" value="월급" v-model="pay_rule" required >
         <div class="tab-group">
@@ -96,16 +95,15 @@
           <p class="title">사진(선택)</p>
           <figure>
             <Icon icon="mdi-light:camera" width="64" height="64"  style="color: #1e1e1e;" />
-            <img :src="previewImage" alt="미리보기" width="64" height="64" v-if="previewImage" /> 
-            <img src="/box64.jpg" alt="미리보기" width="64" height="64" v-if="!previewImage"/>
+            <img :src="previewImage" alt="미리보기" width="64" height="64" v-if="previewImage" />
+            <img src="/box64.jpg" alt="미리보기" width="64" height="64" v-if="!previewImage" />
           </figure>
         </label>
-        <input @change="onFileChange" type="file" id="photo" accept="image/*">
+        <input 
+          @change="onFileChange"
+          type="file" id="photo" accept="image/*">
       </div>
-
-      <button class="btn-submit">
-        등록하기
-      </button>
+      <button class="btn-submit">등록하기</button>
     </form>
   </div>
 </template>
@@ -114,30 +112,30 @@
   import { useAuth } from '../auth/auth';
   import { useRouter } from 'vue-router';
   import supabase from '../supabase';
-  import { ref , onMounted, onUnmounted} from 'vue';
+  import { ref, onMounted, onUnmounted } from 'vue';
   import { Icon } from '@iconify/vue';
 
-  const { isLogin , user , checkLoginStatus } = useAuth ();
-
-  const router  = useRouter();
+  const { isLogin, user, checkLoginStatus } = useAuth();
+  const router = useRouter();
   const isLoading = ref(false);
 
+  // 입력 항목
   const title = ref('');
   const todo = ref('');
-  const pay_rule = ref('');
+  const pay_rule = ref('시급');
   const pay = ref('');
   const desc = ref('');
   const company_name = ref('');
   const location = ref('');
   const tel = ref('');
-  const img_url = ref(''); // 첨부한 사진은 storage에 저장하고 url 저장
+  const img_url = ref(''); // 첨부한 사진은 storage에 저장하고 url을 저장
 
-  let file = null; // 파일 객체 저장 변수
+  let file = null; // 파일객체 저장 변수
 
   const handleSubmit = async () => {
     isLoading.value = true;
 
-    if(previewImage.value){
+    if(previewImage.value) {
       await uploadImage();
     }
 
@@ -153,71 +151,69 @@
         location: location.value,
         tel: tel.value,
         img_url: img_url.value,
-    })
-    if(error) {
-      alert(error.message);
-    }else {
-      alert('등록 성공')
-      router.push('/job-list')
-    }
+      })
+      if(error) {
+        alert(error.message || '등록 실패');
+      } else {
+        alert('등록 성공');
+        router.push('/job-list');
+      }
+      
     isLoading.value = false;
   }
 
   const previewImage = ref(null);
 
-
   const onFileChange = (e) => {
     file = e.target.files[0];
     console.log(file);
+
     if(file) {
       previewImage.value = URL.createObjectURL(file);
-      console.log(previewImage.value)
+      console.log(previewImage.value);
     }
   }
 
   const uploadImage = async () => {
-    const fileExt = file.name.split('.').pop(); // 확장자만 추출
-    const safeName = `image_${Date.now()}.${fileExt}`; // 안전한 파일 이름 생성
-
     const { data, error } = await supabase
-    .storage
-    .from('images')
-    .upload(safeName, file, {
-      cacheControl: '3600', // 캐시 설정
-      upsert: false // 덮어쓰기를 허용 할 것인지 
-    })
-
-    if(error){
-      alert('업로드 오류', error)
-    } else {
-      console.log('uploaded file', data);
-      // 이미지 url 가져오기 
-      const { data:imgData } = supabase
+      .storage
+      .from('images')
+      .upload(file.name, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+    
+      if(error) {
+        alert('업로드 오류');
+      } else {
+        console.log('uploaded file:', data)
+        // 이미지 url 가져오기
+        const { data:imgData } = supabase
         .storage
         .from('images')
-        .getPublicUrl(safeName)
-        
-        console.log('file.url : ', imgData.publicUrl)
+        .getPublicUrl(file.name)
+        console.log('file url:', imgData.publicUrl)
 
-        // 테이블에 저장할 변수
+        // 테이블에 저장할 이미지 URL 변수
         img_url.value = imgData.publicUrl;
-    }
+      }
+
   }
 
-  // 마운트시 로그인 상태 확인하기 
+  // 마운트시 로그인 상태 확인하기
   onMounted(async() => {
 
     await checkLoginStatus();
+    // console.log('auth 정보', isLogin.value, user.value.email);
   })
 
-  onUnmounted(()=> {
-    console.log('unmounted')
-    // 메모리 누수 방지 
-    if(previewImage.value){
+  onUnmounted(() => {
+    console.log('unmounted');
+    // 메모리 누수 방지
+    if(previewImage.value) {
       URL.revokeObjectURL(previewImage.value);
     }
   })
-
 </script>
   
 <style lang="scss" scoped>

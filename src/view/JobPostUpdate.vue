@@ -110,16 +110,16 @@
 
 <script setup>
   import { useAuth } from '../auth/auth';
-  // useRouter-> push() 페이지 이동 등 사용, useRoute-> 현재 경로를 알고 싶거나, 전달된 매게 변수 params 를 참조 할때 사용
-  import { useRouter, useRoute} from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import supabase from '../supabase';
   import { ref, onMounted, onUnmounted } from 'vue';
   import { Icon } from '@iconify/vue';
 
   const { isLogin, user, checkLoginStatus } = useAuth();
   const router = useRouter(); // 페이지 이동 모듈
-  const route = useRoute(); // param 또는 경로 참조 
+  const route = useRoute(); // param 또는 경로 참조
   const isLoading = ref(false);
+  console.log('params:', route.params.id);
 
   // 입력 항목
   const title = ref('');
@@ -130,17 +130,32 @@
   const company_name = ref('');
   const location = ref('');
   const tel = ref('');
-  const img_url = ref(''); //첨부한 사진은 storage에 저장하고 url을 저장
-  // author: 작성자 id(auth.user의 uid)
-  let file = null;
-
+  const img_url = ref('');
+  const prev_img_url = ref(''); // 이전 이미지 url 
+ 
+  const previewImage = ref(null); // 미리보기 이미지 변수
+  let file = null; // 파일 객체
+  
   const handleSubmit = async () => {
     isLoading.value = true;
 
     if(previewImage.value) {
-      await uploadImage();
+      // 기존 이미지 파일과 다른 경우(새로 첨부)
+      if(!prev_img_url.value.includes(file.name)) {
+        await uploadImage();
+
+        // 기존 이미지 삭제
+        const { data, error } = await supabase
+          .storage
+          .from('images')
+          .remove([prev_img_url.value.split('/').pop()])
+      } else {
+        // 파일 미첨부시 이전 이미지 사용
+        img_url.value = prev_img_url.value;
+      }
     }
 
+    // job_post 테이블 수정
     const { error } = await supabase
       .from('job_post')
       .update({ 
@@ -155,6 +170,7 @@
         img_url: img_url.value,
       })
       .eq('id', route.params.id)
+
       if(error) {
         alert(error.message || '글수정 실패');
       } else {
@@ -164,8 +180,6 @@
       
     isLoading.value = false;
   }
-
-  const previewImage = ref(null);
 
   const onFileChange = (e) => {
     file = e.target.files[0];
@@ -177,61 +191,59 @@
     }
   }
 
-  //수정할 글 가져오기 
-  const getPost = async() => {
-    const {data, error} = await supabase
-    .from('job_post')
-    .select()
-    .eq('id', route.params.id)
-    .single()
+  // 수정할 글 가져오기
+  const getPost = async () => {
+    const { data, error } = await supabase
+      .from('job_post')
+      .select()
+      .eq('id', route.params.id)
+      .single()
+    console.log('post: ', data);
 
-    // 가져온 데이터를 상태 변수에 저장하여 폼에 표시 
+    // 가져온 데이터를 상태 변수에 저장하여 폼에 표시
     title.value = data.title;
     todo.value = data.todo;
     pay_rule.value = data.pay_rule;
     pay.value = data.pay;
-    desc.value = data.desc;
+    desc.value = data.desc
     company_name.value = data.company_name;
     location.value = data.location;
     tel.value = data.tel;
     previewImage.value = data.img_url;
+
+    prev_img_url.value = data.img_url; // 이전 이미지 URL
   }
 
   const uploadImage = async () => {
-    const fileExt = file.name.split('.').pop(); // 확장자만 추출
-    const safeName = `image_${Date.now()}.${fileExt}`; // 안전한 파일 이름 생성
-
     const { data, error } = await supabase
-    .storage
-    .from('images')
-    .upload(safeName, file, {
-      cacheControl: '3600', // 캐시 설정
-      upsert: false // 덮어쓰기를 허용 할 것인지 
-    })
-
-    if(error){
-      alert('업로드 오류', error)
-    } else {
-      console.log('uploaded file', data);
-      // 이미지 url 가져오기 
-      const { data:imgData } = supabase
+      .storage
+      .from('images')
+      .upload(file.name, file, {
+        cacheControl: '3600',
+        upsert: false
+      })
+    
+      if(error) {
+        alert('업로드 오류');
+      } else {
+        console.log('uploaded file:', data)
+        // 이미지 url 가져오기
+        const { data:imgData } = supabase
         .storage
         .from('images')
-        .getPublicUrl(safeName)
-        
-        console.log('file.url : ', imgData.publicUrl)
+        .getPublicUrl(file.name)
+        console.log('file url:', imgData.publicUrl)
 
-        // 테이블에 저장할 변수
+        // 테이블에 저장할 이미지 URL 변수
         img_url.value = imgData.publicUrl;
-    }
+      }
   }
-
 
   // 마운트시 로그인 상태 확인하기
   onMounted(async() => {
 
     await checkLoginStatus();
-    getPost();
+    getPost()
     // console.log('auth 정보', isLogin.value, user.value.email);
   })
 
