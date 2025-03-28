@@ -1,7 +1,7 @@
 <template>
-  <section v-if="isLogin">
+  <section v-if="isLogin && post">
     <figure>
-      <img src="https://placehold.co/640x360" alt="head image">
+      <img :src="post.img_url" alt="head image">
     </figure>
 
     <!-- 상세정보 -->
@@ -40,7 +40,7 @@ const { isLogin, user, checkLoginStatus } = useAuth(); // 로그인 상태 확�
 const route = useRoute();
 const router = useRouter();
 const id = route.params.id;
-const post = ref(null);
+const post = ref(null); // 글 데이터 저장 변수
 const isApplied = ref(false); // 지원내역 확인 변수
 
 // 지원내역 확인 함수
@@ -98,10 +98,25 @@ const handleApply = async () => {
 
 }
 
+// 이미지 삭제 함수 
+const deleteImage = async () => {
+  if(post.value.img_url){
+    const {data, error} = await supabase
+      .storage
+      .from('images')
+      .remove([post.value.img_url.split('/').pop()])
+      if(error) console.log('이미지 삭제 실패')
+  }
+
+}
+
 // 글삭제 함수 
 const handleDelete = async () => {
   const conf = confirm('정말 삭제하시겠습니까?');
   if(!conf) return;
+
+  // 이미지 삭제 
+  await deleteImage();
   const { error } = await supabase
   .from('job_post')
   .delete()
