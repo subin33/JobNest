@@ -3,11 +3,11 @@
 
 /* 변수 선언 */
 :root {
-  --main-color-dark:#4B3C30;
+  --main-color-dark: #4B3C30;
   --main-color-light: #D1B000;
-  --text-color-dark:#1e1e1e;
+  --text-color-dark: #1e1e1e;
   --text-color-mid: #666;
-  --text-color-light:#b3b3b3;
+  --text-color-light: #b3b3b3;
 }
 
 * {
@@ -16,21 +16,26 @@
   box-sizing: border-box;
 }
 
-body{
+a {
+  text-decoration: none;
+}
+
+body {
   height: 100vh;
   width: 100vw;
   display: flex;
   justify-content: center;
   align-items: center;
-
+  
   font-family: "Noto Sans KR", sans-serif;
   font-optical-sizing: auto;
   font-weight: 400;
   font-style: normal;
+  font-family: 'Noto Sans KR', sans-serif;
   color: var(--text-color-dark);
 }
 
-a{
+a {
   color: var(--text-color-dark);
 }
 
