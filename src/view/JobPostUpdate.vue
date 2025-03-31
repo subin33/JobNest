@@ -67,7 +67,7 @@
           id="company_name" 
           v-model="company_name" 
           required
-          placeholder="예) 땅콩가게"
+          placeholder="예) 스타벅스"
         >
       </div>
 

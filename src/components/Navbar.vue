@@ -70,7 +70,7 @@
     } else if (currentPath === '/signup') {
       title.value = '회원가입';
     } else if (currentPath === '/job-list') {
-      title.value = '땅콩알바';
+      title.value = '알바잇';
     } else if (currentPath.startsWith('/job-detail')) {
       title.value = '상세보기';
     } else if (currentPath === '/job-post') {
