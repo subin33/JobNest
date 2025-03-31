@@ -114,6 +114,7 @@
   import supabase from '../supabase';
   import { ref, onMounted, onUnmounted } from 'vue';
   import { Icon } from '@iconify/vue';
+  import { v4 as uuidv4 } from 'uuid'; 
 
   const { isLogin, user, checkLoginStatus } = useAuth();
   const router = useRouter(); // 페이지 이동 모듈
@@ -142,7 +143,7 @@
     if(previewImage.value) {
       // 기존 이미지 파일과 다른 경우(새로 첨부)
 
-      if(file && !prev_img_url.value.includes(file.name)) {
+      if(file.name && !prev_img_url.value.includes(file.name)) {
         await uploadImage();
 
         // 기존 이미지 삭제
@@ -216,10 +217,16 @@
   }
 
   const uploadImage = async () => {
+    // 파일 확장자 추출
+    const parts = file.name.split('.');
+    const ext = parts.pop();
+    // UUID 기반 파일명 생성
+    const safeFileName = `${uuidv4()}.${ext}`;
+
     const { data, error } = await supabase
       .storage
       .from('images')
-      .upload(file.name, file, {
+      .upload(safeFileName, file, {
         cacheControl: '3600',
         upsert: false
       })
@@ -232,7 +239,7 @@
         const { data:imgData } = supabase
         .storage
         .from('images')
-        .getPublicUrl(file.name)
+        .getPublicUrl(safeFileName)
         console.log('file url:', imgData.publicUrl)
 
         // 테이블에 저장할 이미지 URL 변수

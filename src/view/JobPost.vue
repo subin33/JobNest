@@ -114,6 +114,7 @@
   import supabase from '../supabase';
   import { ref, onMounted, onUnmounted } from 'vue';
   import { Icon } from '@iconify/vue';
+  import { v4 as uuidv4 } from 'uuid'; 
 
   const { isLogin, user, checkLoginStatus } = useAuth();
   const router = useRouter();
@@ -174,11 +175,21 @@
     }
   }
 
+
+
   const uploadImage = async () => {
+    // Supabase Storage에서는 파일 경로(파일명)에 ASCII가 아닌 문자(예, 한글 등)나 일부 특수문자(예, 괄호 등)가 포함되면 400 (Bad Request) 오류가 발생할 수 있다. 
+    // 파일 확장자 추출
+    const parts = file.name.split('.');
+    const ext = parts.pop();
+    // UUID 기반 파일명 생성
+    const safeFileName = `${uuidv4()}.${ext}`;
+
+    console.log('why?',safeFileName)
     const { data, error } = await supabase
       .storage
       .from('images')
-      .upload(file.name, file, {
+      .upload(safeFileName, file, {
         cacheControl: '3600',
         upsert: false
       })
@@ -191,7 +202,7 @@
         const { data:imgData } = supabase
         .storage
         .from('images')
-        .getPublicUrl(file.name)
+        .getPublicUrl(safeFileName)
         console.log('file url:', imgData.publicUrl)
 
         // 테이블에 저장할 이미지 URL 변수
