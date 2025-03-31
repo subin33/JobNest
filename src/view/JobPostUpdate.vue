@@ -141,7 +141,8 @@
 
     if(previewImage.value) {
       // 기존 이미지 파일과 다른 경우(새로 첨부)
-      if(!prev_img_url.value.includes(file.name)) {
+
+      if(file && !prev_img_url.value.includes(file.name)) {
         await uploadImage();
 
         // 기존 이미지 삭제

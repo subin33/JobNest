@@ -71,7 +71,6 @@
   };
 </script>
   
-<style scoped>
+<style scoped lang="scss">
   @use "../style/form.scss";
-
 </style>
