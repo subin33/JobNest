@@ -1,11 +1,23 @@
 <script setup>
 import { ref } from 'vue'
+import { useHead } from '@vueuse/head' // ✅ 메타태그 설정용
 
 defineProps({
   msg: String,
 })
 
 const count = ref(0)
+
+useHead({
+  title: '알바잇 - Vue3 테스트 컴포넌트',
+  meta: [
+    { name: 'description', content: '알바가 필요할 때 알바잇' },
+    { property: 'og:title', content: '알바잇' },
+    { property: 'og:description', content: '알바가 필요할 때 알바잇' },
+    { property: 'og:image', content: 'https://job-nest-ocoqw9l5b-subin-project.vercel.app/job-list/icon-512x512.png' },
+    { property: 'og:url', content: 'https://job-nest-ocoqw9l5b-subin-project.vercel.app/job-list' },
+  ]
+})
 </script>
 
 <template>
