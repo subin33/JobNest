@@ -185,7 +185,6 @@
     // UUID 기반 파일명 생성
     const safeFileName = `${uuidv4()}.${ext}`;
 
-    console.log('why?',safeFileName)
     const { data, error } = await supabase
       .storage
       .from('images')

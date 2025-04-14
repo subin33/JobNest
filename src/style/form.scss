@@ -58,3 +58,50 @@ button:hover {
   margin-top: 10px;
   font-size: 0.9em;
 }
+
+
+.login-guide-toggle {
+  text-align: right;
+  margin-bottom: 0.5rem;
+
+  button {
+    background: none;
+    border: none;
+    color: #4b3c30;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.login-guide {
+  width: 50vw;
+  margin: 0 auto 1.5rem auto; 
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+
+  code {
+    background-color: #eee;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+  }
+
+  .small-text {
+    color: #666;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+  }
+  ul {
+    list-style: none; 
+    padding-left: 0;      
+  }
+}
