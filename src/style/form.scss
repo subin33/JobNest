@@ -17,7 +17,8 @@ label {
   font-weight: bold;
 }
 
-input, textarea { // textarea 추가
+input,
+textarea {
   width: 100%;
   padding: 10px;
   box-sizing: border-box;
@@ -46,11 +47,21 @@ button:hover {
 }
 
 @keyframes shake {
-  0% { transform: translateX(0); }
-  25% { transform: translateX(-5px); }
-  50% { transform: translateX(5px); }
-  75% { transform: translateX(-5px); }
-  100% { transform: translateX(0); }
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
+  }
 }
 
 .error-message {
@@ -58,7 +69,6 @@ button:hover {
   margin-top: 10px;
   font-size: 0.9em;
 }
-
 
 .login-guide-toggle {
   text-align: right;
@@ -71,6 +81,7 @@ button:hover {
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: bold;
+    margin-bottom: 3px;
 
     &:hover {
       text-decoration: underline;
@@ -79,8 +90,8 @@ button:hover {
 }
 
 .login-guide {
-  width: 50vw;
-  margin: 0 auto 1.5rem auto; 
+  width: 80%;
+  margin: 0 auto 1.5rem auto;
   background-color: #f9f9f9;
   border: 1px solid #ddd;
   border-radius: 8px;
@@ -101,7 +112,7 @@ button:hover {
     margin-top: 0.5rem;
   }
   ul {
-    list-style: none; 
-    padding-left: 0;      
+    list-style: none;
+    padding-left: 0;
   }
 }
