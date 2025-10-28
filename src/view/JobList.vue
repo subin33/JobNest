@@ -6,48 +6,50 @@
           <h3>{{ post.title }}</h3>
           <address>{{ post.location }}</address>
           <span>&middot;</span>
-          <time>{{ format(new Date(post.created_at),"yyyy-MM-dd") }}</time>
+          <time>{{ format(new Date(post.created_at), "yyyy-MM-dd") }}</time>
         </div>
         <div class="bottom-info">
-          <p class="pay">시급: {{post.pay}} 원</p>
-          <img v-if="post.img_url" :src="post.img_url" alt="image" width="64" height="64">
+          <p class="pay">시급: {{ post.pay }} 원</p>
+          <img v-if="post.img_url" :src="post.img_url" alt="image" width="64" height="64" />
         </div>
       </router-link>
     </li>
   </ul>
-    <p v-else class="loading_info">구인 목록을 불러오는 중입니다...</p>
+  <p v-else class="loading_info">구인 목록을 불러오는 중입니다...</p>
 </template>
 
 <script setup>
-  import supabase from '../supabase';
-  import { ref, onMounted } from 'vue';
-  import { format } from "date-fns";
+import supabase from "../supabase";
+import { ref, onMounted } from "vue";
+import { format } from "date-fns";
 
-  const posts = ref([]);
+const posts = ref([]);
 
-  // 구인 목록 가져오기
-  onMounted(async() => {
-    const {data,error} = await supabase.from('job_post').select('*').order('created_at' ,{ascending:false});
-    posts.value = data;
-    console.log(posts.value)
+// 구인 목록 가져오기
+onMounted(async () => {
+  const { data, error } = await supabase.from("job_post").select("*").order("created_at", { ascending: false });
+  posts.value = data;
+  console.log(posts.value);
 
-    if(error) {
-      alert('구인목록 가져오기 실패')
-    }
-  })
+  if (error) {
+    alert("구인목록 가져오기 실패");
+  }
+});
 </script>
- 
+
 <style lang="scss" scoped>
 ul {
   list-style: none;
   padding: 0;
   li {
     padding: 15px;
-    border-bottom: 1px solid rgba(0,0,0, 0.2);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
   }
 }
 
-address, time, span {
+address,
+time,
+span {
   font-style: normal;
   display: inline;
   font-size: 12px;
@@ -66,4 +68,3 @@ address, time, span {
   margin-top: 15px;
 }
 </style>
-
