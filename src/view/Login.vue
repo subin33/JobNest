@@ -3,26 +3,17 @@
     <p>로그인 처리 중 ...</p>
   </div>
 
-
   <div class="form-container">
     <form @submit.prevent="handleLogin">
       <div class="form-group">
         <label for="email">Email</label>
-        <input 
-          type="email" 
-          id="email" 
-          placeholder="이메일 입력"
-          required
-          v-model="email"
-          :class="{ error: loginError }"
-          @input="resetLoginError"
-        />
+        <input type="email" id="email" placeholder="이메일 입력" required v-model="email" :class="{ error: loginError }" @input="resetLoginError" />
       </div>
       <div class="form-group">
         <label for="password">Password</label>
-        <input 
-          type="password" 
-          id="password" 
+        <input
+          type="password"
+          id="password"
           placeholder="비밀번호 입력"
           required
           v-model="password"
@@ -35,10 +26,10 @@
       <p v-if="loginError" class="error-message">아이디와 비밀번호를 정확히 입력해 주세요.</p>
     </form>
   </div>
-  
+
   <div class="login-guide-toggle">
     <button @click="toggleGuide">
-      {{ showGuide ? '테스트 계정 접기 ▲' : '테스트 계정 보기 ▼' }}
+      {{ showGuide ? "테스트 계정 접기 ▲" : "테스트 계정 보기 ▼" }}
     </button>
   </div>
 
@@ -52,20 +43,20 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import supabase from '../supabase';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import supabase from "../supabase";
 
-const email = ref('');
-const password = ref('');
+const email = ref("test@gmail.com");
+const password = ref("123123123");
+
 const isLoading = ref(false);
 const loginError = ref(false);
-const showGuide = ref(false); 
+const showGuide = ref(false);
 
 const router = useRouter();
 
 const handleLogin = async () => {
-  console.log(email.value, password.value);
   isLoading.value = true;
   const { data, error } = await supabase.auth.signInWithPassword({
     email: email.value,
@@ -77,9 +68,9 @@ const handleLogin = async () => {
     isLoading.value = false;
     loginError.value = true;
   } else {
-    alert('로그인 성공');
+    alert("로그인 성공");
     isLoading.value = false;
-    router.push('/job-list');
+    router.push("/job-list");
   }
 };
 
@@ -94,5 +85,4 @@ const toggleGuide = () => {
 
 <style scoped lang="scss">
 @use "../style/form.scss";
-
 </style>
