@@ -198,7 +198,7 @@ h2 {
 }
 
 .bottom-btn-group {
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;

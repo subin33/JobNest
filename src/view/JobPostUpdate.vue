@@ -7,51 +7,33 @@
       <!-- 1.제목 -->
       <div class="form-group">
         <label for="title">제목</label>
-        <input 
-          type="text" 
-          id="title" 
-          required
-          placeholder="공고 내용을 요약해 주세요."
-          v-model="title"
-        >
+        <input type="text" id="title" required placeholder="공고 내용을 요약해 주세요." v-model="title" />
       </div>
 
       <!-- 2.하는 일 -->
       <div class="form-group">
         <label for="todo">하는 일</label>
-        <input 
-          type="text" 
-          id="todo" 
-          v-model="todo"
-          placeholder="해야할 업무를 입력해주세요."
-          required
-        />
+        <input type="text" id="todo" v-model="todo" placeholder="해야할 업무를 입력해주세요." required />
       </div>
 
       <!-- 3.시급, 월급 항목 선택 -->
       <div class="form-group">
-        <input type="radio" id="pay_rule1" name="pay_rule" value="시급" v-model="pay_rule" required checked>
-        <input type="radio" id="pay_rule2" name="pay_rule" value="월급" v-model="pay_rule" required >
+        <input type="radio" id="pay_rule1" name="pay_rule" value="시급" v-model="pay_rule" required checked />
+        <input type="radio" id="pay_rule2" name="pay_rule" value="월급" v-model="pay_rule" required />
         <div class="tab-group">
           <label for="pay_rule1">시급</label>
           <label for="pay_rule2">월급</label>
         </div>
         <!-- 4.금액 입력 -->
-        <input 
-          type="number" 
-          id="pay" 
-          placeholder="시급 또는 월급을 입력해주세요."
-          v-model="pay" 
-          required
-        >
+        <input type="number" id="pay" placeholder="시급 또는 월급을 입력해주세요." v-model="pay" required />
       </div>
 
       <!-- 5.자세한 설명 -->
       <div class="form-group">
         <label for="desc">자세한 설명</label>
-        <textarea 
-          name="desc" 
-          id="desc" 
+        <textarea
+          name="desc"
+          id="desc"
           v-model="desc"
           rows="4"
           required
@@ -62,31 +44,19 @@
       <!-- 6.업체명 -->
       <div class="form-group">
         <label for="company_name">업체명</label>
-        <input 
-          type="text" 
-          id="company_name" 
-          v-model="company_name" 
-          required
-          placeholder="예) 스타벅스"
-        >
+        <input type="text" id="company_name" v-model="company_name" required placeholder="예) 스타벅스" />
       </div>
 
       <!-- 7.위치(주소) -->
       <div class="form-group">
         <label for="location">위치</label>
-        <input 
-          type="text" 
-          id="location" 
-          v-model="location" 
-          required 
-          placeholder="예) 서울시 강남구 논현동"
-        >
+        <input type="text" id="location" v-model="location" required placeholder="예) 서울시 강남구 논현동" />
       </div>
 
       <!-- 8.연락처 -->
       <div class="form-group">
         <label for="tel">연락처</label>
-        <input type="text" id="tel" v-model="tel" required placeholder="예) 010-1234-5678">
+        <input type="text" id="tel" v-model="tel" required placeholder="예) 010-1234-5678" />
       </div>
 
       <!-- 9.사진(선택 입력) -->
@@ -94,14 +64,12 @@
         <label for="photo">
           <p class="title">사진(선택)</p>
           <figure>
-            <Icon icon="mdi-light:camera" width="64" height="64"  style="color: #1e1e1e;" />
+            <Icon icon="mdi-light:camera" width="64" height="64" style="color: #1e1e1e" />
             <img :src="previewImage" alt="미리보기" width="64" height="64" v-if="previewImage" />
             <img src="/box64.jpg" alt="미리보기" width="64" height="64" v-if="!previewImage" />
           </figure>
         </label>
-        <input 
-          @change="onFileChange"
-          type="file" id="photo" accept="image/*">
+        <input @change="onFileChange" type="file" id="photo" accept="image/*" />
       </div>
       <button class="btn-submit">수정완료</button>
     </form>
@@ -109,223 +77,211 @@
 </template>
 
 <script setup>
-  import { useAuth } from '../auth/auth';
-  import { useRouter, useRoute } from 'vue-router';
-  import supabase from '../supabase';
-  import { ref, onMounted, onUnmounted } from 'vue';
-  import { Icon } from '@iconify/vue';
-  import { v4 as uuidv4 } from 'uuid'; 
+import { useAuth } from "../auth/auth";
+import { useRouter, useRoute } from "vue-router";
+import supabase from "../supabase";
+import { ref, onMounted, onUnmounted } from "vue";
+import { Icon } from "@iconify/vue";
+import { v4 as uuidv4 } from "uuid";
 
-  const { isLogin, user, checkLoginStatus } = useAuth();
-  const router = useRouter(); // 페이지 이동 모듈
-  const route = useRoute(); // param 또는 경로 참조
-  const isLoading = ref(false);
-  console.log('params:', route.params.id);
+const { isLogin, user, checkLoginStatus } = useAuth();
+const router = useRouter(); // 페이지 이동 모듈
+const route = useRoute(); // param 또는 경로 참조
+const isLoading = ref(false);
+console.log("params:", route.params.id);
 
-  // 입력 항목
-  const title = ref('');
-  const todo = ref('');
-  const pay_rule = ref('시급');
-  const pay = ref('');
-  const desc = ref('');
-  const company_name = ref('');
-  const location = ref('');
-  const tel = ref('');
-  const img_url = ref('');
-  const prev_img_url = ref(''); // 이전 이미지 url 
- 
-  const previewImage = ref(null); // 미리보기 이미지 변수
-  let file = null; // 파일 객체
-  
-  const handleSubmit = async () => {
-    isLoading.value = true;
+// 입력 항목
+const title = ref("");
+const todo = ref("");
+const pay_rule = ref("시급");
+const pay = ref("");
+const desc = ref("");
+const company_name = ref("");
+const location = ref("");
+const tel = ref("");
+const img_url = ref("");
+const prev_img_url = ref(""); // 이전 이미지 url
 
-    if(previewImage.value) {
-      // 기존 이미지 파일과 다른 경우(새로 첨부)
+const previewImage = ref(null); // 미리보기 이미지 변수
+let file = null; // 파일 객체
 
-      if(file.name && !prev_img_url.value.includes(file.name)) {
-        await uploadImage();
+const handleSubmit = async () => {
+  isLoading.value = true;
 
-        // 기존 이미지 삭제
-        const { data, error } = await supabase
-          .storage
-          .from('images')
-          .remove([prev_img_url.value.split('/').pop()])
-      } else {
-        // 파일 미첨부시 이전 이미지 사용
-        img_url.value = prev_img_url.value;
-      }
+  // 1. 이미지 처리
+  if (file) {
+    // 새 이미지 업로드
+    await uploadImage();
+
+    // 기존 이미지 삭제
+    if (prev_img_url.value) {
+      await supabase.storage.from("images").remove([prev_img_url.value.split("/").pop()]);
     }
-
-    // job_post 테이블 수정
-    const { error } = await supabase
-      .from('job_post')
-      .update({ 
-        title: title.value,
-        todo: todo.value,
-        pay_rule: pay_rule.value,
-        pay: pay.value,
-        desc: desc.value,
-        company_name: company_name.value,
-        location: location.value,
-        tel: tel.value,
-        img_url: img_url.value,
-      })
-      .eq('id', route.params.id)
-
-      if(error) {
-        alert(error.message || '글수정 실패');
-      } else {
-        alert('글수정 성공');
-        router.push('/job-list');
-      }
-      
-    isLoading.value = false;
+  } else {
+    // 새 이미지 없으면 기존 이미지 유지
+    img_url.value = prev_img_url.value;
   }
 
-  const onFileChange = (e) => {
-    file = e.target.files[0];
-    console.log(file);
+  // 2. 글 수정
+  const { error } = await supabase
+    .from("job_post")
+    .update({
+      title: title.value,
+      todo: todo.value,
+      pay_rule: pay_rule.value,
+      pay: pay.value,
+      desc: desc.value,
+      company_name: company_name.value,
+      location: location.value,
+      tel: tel.value,
+      img_url: img_url.value,
+    })
+    .eq("id", route.params.id);
 
-    if(file) {
-      previewImage.value = URL.createObjectURL(file);
-      console.log(previewImage.value);
-    }
+  if (error) {
+    alert(error.message || "글수정 실패");
+  } else {
+    alert("글수정 성공");
+    router.push("/job-list");
   }
 
-  // 수정할 글 가져오기
-  const getPost = async () => {
-    const { data, error } = await supabase
-      .from('job_post')
-      .select()
-      .eq('id', route.params.id)
-      .single()
-    console.log('post: ', data);
+  isLoading.value = false;
+};
 
-    // 가져온 데이터를 상태 변수에 저장하여 폼에 표시
-    title.value = data.title;
-    todo.value = data.todo;
-    pay_rule.value = data.pay_rule;
-    pay.value = data.pay;
-    desc.value = data.desc
-    company_name.value = data.company_name;
-    location.value = data.location;
-    tel.value = data.tel;
-    previewImage.value = data.img_url;
+const onFileChange = (e) => {
+  file = e.target.files[0];
+  console.log(file);
 
-    prev_img_url.value = data.img_url; // 이전 이미지 URL
+  if (file) {
+    previewImage.value = URL.createObjectURL(file);
+    console.log(previewImage.value);
   }
+};
 
-  const uploadImage = async () => {
-    // 파일 확장자 추출
-    const parts = file.name.split('.');
-    const ext = parts.pop();
-    // UUID 기반 파일명 생성
-    const safeFileName = `${uuidv4()}.${ext}`;
+// 수정할 글 가져오기
+const getPost = async () => {
+  const { data, error } = await supabase.from("job_post").select().eq("id", route.params.id).single();
+  console.log("post: ", data);
 
-    const { data, error } = await supabase
-      .storage
-      .from('images')
-      .upload(safeFileName, file, {
-        cacheControl: '3600',
-        upsert: false
-      })
-    
-      if(error) {
-        alert('업로드 오류');
-      } else {
-        console.log('uploaded file:', data)
-        // 이미지 url 가져오기
-        const { data:imgData } = supabase
-        .storage
-        .from('images')
-        .getPublicUrl(safeFileName)
-        console.log('file url:', imgData.publicUrl)
+  // 가져온 데이터를 상태 변수에 저장하여 폼에 표시
+  title.value = data.title;
+  todo.value = data.todo;
+  pay_rule.value = data.pay_rule;
+  pay.value = data.pay;
+  desc.value = data.desc;
+  company_name.value = data.company_name;
+  location.value = data.location;
+  tel.value = data.tel;
+  previewImage.value = data.img_url;
 
-        // 테이블에 저장할 이미지 URL 변수
-        img_url.value = imgData.publicUrl;
-      }
+  prev_img_url.value = data.img_url; // 이전 이미지 URL
+};
+
+const uploadImage = async () => {
+  // 파일 확장자 추출
+  const parts = file.name.split(".");
+  const ext = parts.pop();
+  // UUID 기반 파일명 생성
+  const safeFileName = `${uuidv4()}.${ext}`;
+
+  const { data, error } = await supabase.storage.from("images").upload(safeFileName, file, {
+    cacheControl: "3600",
+    upsert: false,
+  });
+
+  if (error) {
+    alert("업로드 오류");
+  } else {
+    console.log("uploaded file:", data);
+    // 이미지 url 가져오기
+    const { data: imgData } = supabase.storage.from("images").getPublicUrl(safeFileName);
+    console.log("file url:", imgData.publicUrl);
+
+    // 테이블에 저장할 이미지 URL 변수
+    img_url.value = imgData.publicUrl;
   }
+};
 
-  // 마운트시 로그인 상태 확인하기
-  onMounted(async() => {
+// 마운트시 로그인 상태 확인하기
+onMounted(async () => {
+  await checkLoginStatus();
+  getPost();
+  // console.log('auth 정보', isLogin.value, user.value.email);
+});
 
-    await checkLoginStatus();
-    getPost()
-    // console.log('auth 정보', isLogin.value, user.value.email);
-  })
-
-  onUnmounted(() => {
-    console.log('unmounted');
-    // 메모리 누수 방지
-    if(previewImage.value) {
-      URL.revokeObjectURL(previewImage.value);
-    }
-  })
+onUnmounted(() => {
+  console.log("unmounted");
+  // 메모리 누수 방지
+  if (previewImage.value) {
+    URL.revokeObjectURL(previewImage.value);
+  }
+});
 </script>
-  
+
 <style lang="scss" scoped>
-  @use "../style/form.scss";
+@use "../style/form.scss";
 
-  .form-container {
-    margin-top: 20px;
-    padding-bottom: 50px;
+.form-container {
+  margin-top: 20px;
+  // padding-bottom: 50px;
 
-    .tab-group {
+  .tab-group {
+    display: flex;
+    gap: 15px;
+    label {
+      flex: 1;
+      border: 1px solid var(--main-color-dark);
+      border-radius: 8px;
+      text-align: center;
+      padding: 12px;
+    }
+  }
+
+  input[type="radio"] {
+    display: none;
+  }
+
+  input[type="radio"]:nth-child(1):checked ~ .tab-group label:nth-child(1) {
+    background: var(--main-color-dark);
+    color: #fff;
+  }
+
+  input[type="radio"]:nth-child(2):checked ~ .tab-group label:nth-child(2) {
+    background: var(--main-color-dark);
+    color: #fff;
+  }
+
+  #pay {
+    margin-top: 8px;
+  }
+
+  // for=photo를 가진 form-group의 후손 input의 보더 스타일 제거
+  .form-group:has(label[for="photo"]) input {
+    border: none;
+  }
+
+  //file 아이콘
+  label[for="photo"] {
+    figure {
       display: flex;
-      gap: 15px;
-      label { 
-        flex: 1;
-        border: 1px solid var(--main-color-dark);
-        border-radius: 8px;
-        text-align: center;
-        padding: 12px;
+      align-items: center;
+      img {
+        border: 1px solid red;
+        margin-left: 30px;
       }
     }
-
-    input[type="radio"] {
-        display: none;
-    }
-
-    input[type="radio"]:nth-child(1):checked ~ .tab-group label:nth-child(1) {
-      background: var(--main-color-dark);
-      color: #fff;
-    }
-
-    input[type="radio"]:nth-child(2):checked ~ .tab-group label:nth-child(2) {
-      background: var(--main-color-dark);
-      color: #fff;
-    }
-
-    #pay { margin-top: 8px;}
-
-    // for=photo를 가진 form-group의 후손 input의 보더 스타일 제거
-    .form-group:has(label[for=photo]) input {
-      border: none;
-    }
-
-    //file 아이콘
-    label[for=photo] {
-      figure { 
-        display: flex; 
-        align-items: center;
-        img { 
-          border: 1px solid red;
-          margin-left: 30px; 
-        }
-      }
-    }
-    input[type="file"] {
-      display: none;
-    }
   }
-
-  .btn-submit {
-    background: var(--main-color-light);
+  input[type="file"] {
+    display: none;
   }
+}
 
-  .form-group:has(label[for=photo]) {
-    padding-bottom: 25px;
-    border-bottom: 5px solid #ccc;
-  }
+.btn-submit {
+  background: var(--main-color-light);
+}
+
+.form-group:has(label[for="photo"]) {
+  padding-bottom: 25px;
+  border-bottom: 5px solid #ccc;
+}
 </style>
