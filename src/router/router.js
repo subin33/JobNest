@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import supabase from "../supabase";
+
 import Login from "../view/Login.vue";
 import SignUp from "../view/SignUp.vue";
 import JobPost from "../view/JobPost.vue";
@@ -19,28 +21,45 @@ const routes = [
   {
     path: "/job-post",
     component: JobPost,
+    meta: { requiresAuth: true },
   },
   {
     path: "/job-list",
     component: JobList,
+    meta: { requiresAuth: true },
   },
   {
     path: "/job-detail/:id",
     component: JobDetail,
+    meta: { requiresAuth: true },
   },
   {
     path: "/user-profile",
     component: UserProfile,
+    meta: { requiresAuth: true },
   },
   {
     path: "/job-post-update/:id",
     component: JobPostUpdate,
+    meta: { requiresAuth: true },
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
+});
+
+router.beforeEach(async (to, from, next) => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (to.meta.requiresAuth && !session) {
+    next("/");
+  } else {
+    next();
+  }
 });
 
 export default router;
